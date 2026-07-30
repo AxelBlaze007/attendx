@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum RewardCategory {
+  CANTEEN
+  STATIONERY
+  PRINTING
+}
+
+enum ClaimStatus {
+  PENDING
+  CLAIMED
+  EXPIRED
+}
+
+enum LaptopStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+}
+
+enum BookingDuration {
+  HOURLY
+  HALF_DAY
+  FULL_DAY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+}
+
+enum MatchStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id                String          @id @default(cuid())
+  email             String          @unique
+  password          String
+  name              String
+  avatarUrl         String?
+  phoneNumber       String?
+  department        String
+  year              Int
+  role              Role            @default(STUDENT)
+  subscriptionStatus SubscriptionStatus @default(ACTIVE)
+  pointsBalance     Int             @default(0)
+  skills            String[]
+  interests         String[]
+
+  resetPasswordToken     String?
+  resetPasswordExpiresAt DateTime?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  attendances         Attendance[]
+  rewardClaims        RewardClaim[]
+  laptopBookings      LaptopBooking[]
+  sentMatchRequests   MatchRequest[]  @relation("SentRequests")
+  receivedMatchRequests MatchRequest[] @relation("ReceivedRequests")
+  sentMessages        ChatMessage[]   @relation("SentMessages")
+  receivedMessages    ChatMessage[]   @relation("ReceivedMessages")
+}
+
+model Attendance {
+  id          String   @id @default(cuid())
+  userId      String
+  subjectName String
+  roomNo      String
+  timestamp   DateTime @default(now())
+  pointsEarned Int     @default(2)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RewardItem {
+  id            String         @id @default(cuid())
+  title         String
+  category      RewardCategory
+  pointCost     Int
+  availableQty  Int
+  imageUrl      String?
+
+  claims RewardClaim[]
+}
+
+model RewardClaim {
+  id            String      @id @default(cuid())
+  userId        String
+  rewardItemId  String
+  qrVoucherCode String      @unique
+  status        ClaimStatus @default(PENDING)
+  expiresAt     DateTime
+  createdAt     DateTime    @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rewardItem RewardItem @relation(fields: [rewardItemId], references: [id], onDelete: Cascade)
+}
+
+model LaptopInventory {
+  id         String        @id @default(cuid())
+  modelName  String
+  specs      String
+  labLocation String
+  status     LaptopStatus  @default(AVAILABLE)
+  hourlyRate Float
+
+  bookings LaptopBooking[]
+}
+
+model LaptopBooking {
+  id            String        @id @default(cuid())
+  userId        String
+  laptopId      String
+  duration      BookingDuration
+  startTime     DateTime
+  endTime       DateTime
+  totalAmount   Float
+  paymentStatus PaymentStatus @default(PENDING)
+  pickupQrCode  String?
+  createdAt     DateTime      @default(now())
+
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  laptop LaptopInventory @relation(fields: [laptopId], references: [id], onDelete: Cascade)
+}
+
+model MatchRequest {
+  id              String      @id @default(cuid())
+  senderId        String
+  receiverId      String
+  matchPercentage Float
+  status          MatchStatus @default(PENDING)
+  createdAt       DateTime    @default(now())
+
+  sender   User @relation("SentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  message    String
+  timestamp  DateTime @default(now())
+
+  sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+}
