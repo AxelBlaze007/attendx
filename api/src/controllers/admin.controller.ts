@@ -116,7 +116,7 @@ export async function getAllUsers(req: AuthRequest, res: Response, next: NextFun
 
 export async function getUserById(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -145,7 +145,7 @@ export async function getUserById(req: AuthRequest, res: Response, next: NextFun
 
 export async function updateUser(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { name, email, department, year, role, subscriptionStatus, pointsBalance, skills, interests } = req.body;
 
     const data: Record<string, unknown> = {};
@@ -184,7 +184,7 @@ export async function updateUser(req: AuthRequest, res: Response, next: NextFunc
 
 export async function deleteUser(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     if (id === req.user!.userId) {
       throw new AppError("Cannot delete your own account", 400);
     }
@@ -209,7 +209,7 @@ export async function createRewardItem(req: AuthRequest, res: Response, next: Ne
 
 export async function updateRewardItem(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { title, category, pointCost, availableQty, imageUrl } = req.body;
 
     const data: Record<string, unknown> = {};
@@ -228,7 +228,7 @@ export async function updateRewardItem(req: AuthRequest, res: Response, next: Ne
 
 export async function deleteRewardItem(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     await prisma.rewardItem.delete({ where: { id } });
     res.json({ success: true, message: "Reward item deleted" });
   } catch (error) {
@@ -275,7 +275,7 @@ export async function createLaptop(req: AuthRequest, res: Response, next: NextFu
 
 export async function updateLaptop(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { modelName, specs, labLocation, hourlyRate, status } = req.body;
 
     const data: Record<string, unknown> = {};
@@ -294,7 +294,7 @@ export async function updateLaptop(req: AuthRequest, res: Response, next: NextFu
 
 export async function deleteLaptop(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     await prisma.laptopInventory.delete({ where: { id } });
     res.json({ success: true, message: "Laptop deleted" });
   } catch (error) {
