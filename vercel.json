@@ -1,7 +1,7 @@
 {
   "buildCommand": "cd app && npm run build",
   "outputDirectory": "app/dist",
-  "installCommand": "cd api && npm install && cd ../app && npm install",
+  "installCommand": "cd api && npm install && npx prisma generate && cd ../app && npm install",
   "functions": {
     "api/index.ts": { "runtime": "@vercel/node@3.x" }
   },
