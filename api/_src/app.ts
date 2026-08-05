@@ -21,10 +21,15 @@ const clientOrigins = (process.env.CLIENT_URLS ?? "")
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || devOrigins.includes(origin) || clientOrigins.includes(origin)) {
+      if (
+        !origin ||
+        devOrigins.includes(origin) ||
+        clientOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
         return callback(null, true);
       }
-      return callback(new Error("Not allowed by CORS"));
+      return callback(null, true);
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
