@@ -1,16 +1,9 @@
 {
-  "version": 2,
   "buildCommand": "cd app && npm run build",
   "outputDirectory": "app/dist",
-  "installCommand": "cd api && npm install && npx prisma generate && cd ../app && npm install",
-  "builds": [
-    {
-      "src": "api/index.ts",
-      "use": "@vercel/node"
-    }
-  ],
+  "installCommand": "cd api && npm install && npx prisma generate --schema=./_prisma/schema.prisma && cd ../app && npm install",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.ts" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "env": {
