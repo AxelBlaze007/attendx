@@ -3,7 +3,7 @@
   "outputDirectory": "app/dist",
   "installCommand": "cd api && npm install && npx prisma generate && cd ../app && npm install",
   "functions": {
-    "api/index.ts": { "runtime": "@vercel/node@3.x" }
+    "api/index.ts": { "runtime": "@vercel/node" }
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
